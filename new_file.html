@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" href="css/animate.css" />
+		<style type="text/css">
+			* {
+				padding: 0;
+				margin: 0;
+			}
+			.box {
+				width: 52px;
+				height: 52px;
+				position: absolute;
+				bottom: 0;
+				left: 140px;
+				/*background: orange;*/
+			}
+			#boxs{
+				/*overflow: hidden;*/
+				position: relative;
+				width: 385px;
+				height: 600px;
+				margin: 25px auto;
+				border: 2px solid black;
+				background:url(img/bg_03.jpg);
+			}
+			a {
+				width: 50px;
+				height: 40px;
+				display: inline-block;
+
+			}
+			input {
+				width: 50px;
+				height: 20px;
+				padding-left: 25px;
+			}
+			.sudu{
+				position:fixed;
+				top: 100px;
+				right:300px;
+			}
+			#_su{
+				position: fixed;
+				left: 550px;
+				top: 300px;
+			}
+			#scrode{
+				width: 80px;
+				height: 60px;
+				border: 3px solid black;
+				border-radius: 30px;
+				line-height: 60px;
+				text-align: center;
+				font-size: 20px;
+				color: orange;
+			}
+			.pd{
+				width:5px;
+				height:15px;
+				border-radius:50%;
+				position:absolute;
+				background:#f06;
+			}		
+		</style>
+	</head>
+	<body>
+		<div id="boxs" class="diy">
+			<a></a>
+			<a></a>
+			<a></a>
+			<a></a>
+			<a></a>
+			<a></a>
+			<a></a>
+			<div class="box" id="_move">
+				<img src="img/P1.png" width="52px" height="52px" />
+			</div>
+		</div>
+				<div class="sudu">
+					选择速度 ：<input id="inVal" type="text" value="500"/>
+					<p style="font-size: 20px;margin:20px;">暂停</p>
+					<p style="font-size: 20px;margin:20px;">重玩</p>
+					<div id="scrode"></div>
+				</div>
+			<div id="_su" style="width: 250px;height: 60px;">
+				<img src="img/timgs.gif" width="250px"/>
+			</div>
+	</body>
+</html>
+<script type="text/javascript" src="js/public.js" ></script>
+	<script>
+		var _move = document.getElementById("_move");
+		var inVal = document.getElementById("inVal");
+		var scrode = document.getElementById("scrode");
+		var boxs = document.getElementById("boxs");
+		var aInv = document.querySelectorAll('a');
+		var _su = document.getElementById("_su");
+		var endP = document.querySelectorAll("p");
+		var spanD=0;
+		var spanL=0;
+		var spanT=0;
+		var ph=0;
+		var pl=0;
+		var ziTime=0;
+		var ziDiv=0;
+		var ziDan = 0;
+		var numSc = 0;
+		_su.onclick = function() {
+			_su.style.display='none';
+			var audioa = document.createElement("audio");
+			audioa.src = "audio/敌军还有五秒到达战场.mp3";
+			audioa.play();
+			var audios = document.createElement("audio");
+			audios.src = "audio/bg.mp3";
+			audios.loop='loop'
+			audios.play();
+			var timeSet = inVal.value;
+
+			//	滚动背景
+			var bgTime = 1;
+			var bgTimer = setInterval(function() {
+				bgTime = bgTime + 2;
+				boxs.style.backgroundPosition = '0px ' + bgTime + 'px';
+			}, 10);
+			setTimeout(function(){
+			
+			//暂停
+			endP[0].onclick = function(){
+				clearInterval(bgTimer);
+				clearInterval(bbb);
+				_su.style.display='block';
+			}
+			//刷新
+			endP[1].onclick = function(){
+				window.location.reload();
+			}
+			//随机障碍物
+			var bbb = setInterval(function() {
+				//span样式设置
+				var span = document.createElement("span");
+				span.style.width = 52 + "px";
+				span.style.height = 52 + "px";
+				span.style.float = 'left';
+				span.style.marginLeft = 4.5 + 'px';
+				span.style.display = 'block';
+				var randImg = getRand(1,2);
+				span.style.backgroundImage = 'url(img/' + randImg + '.png)';
+				span.style.backgroundSize='52px 52px'
+				span.style.backgroundRepeat = 'no-repeat'
+				span.style.position = 'absolute';
+				var aRand = getRand(0, 6);
+				aInv[aRand].appendChild(span);
+				spanD=span;
+				spanL=span.offsetLeft;
+				spanT=span.offsetTop;
+				
+				var tt = 0;
+				var lf =0;
+				var count=0;
+				var timeImg = getRand(1,5);
+				var imgTime = setInterval(function() {
+					tt = tt + 1;
+					span.style.top = tt + "px";
+					//死亡判断
+					var lW = _move.offsetLeft-span.offsetLeft;
+					var lw = span.offsetLeft-_move.offsetLeft;
+					var tp = _move.offsetTop-span.offsetTop;
+					var tP = span.offsetTop - _move.offsetTop;
+					
+						if((ph-span.offsetTop-boxs.offsetTop<=span.offsetHeight && ph-span.offsetTop-boxs.offsetTop>=0) && (pl-span.offsetLeft-boxs.offsetLeft<=span.offsetWidth&&pl-span.offsetLeft-boxs.offsetLeft>=0)){
+							//分数统计
+							span.remove();
+							ziDiv.remove();
+							var audio = document.createElement("audio");
+							numSc++;
+							scrode.innerHTML=numSc;
+							audio.src = "audio/"+numSc+".mp3";
+							audio.play();
+								if(numSc%6==0){
+									audio.src = "audio/bga.mp3";
+									audio.play();
+								}
+								if(numSc>6 && numSc%6!=0){
+									audio.src = "audio/9519.mp3"
+									audio.play();	
+								}
+						}
+						if(((lW>=0 && lW<=span.offsetWidth-10) || (lw <= _move.offsetWidth-6 && lw >= 0)) && ((tp<=span.offsetHeight-5 && tp>=0) || (tP<=_move.offsetHeight-5 && tP>=0))){
+							
+							var audioEnd = document.createElement("audio");
+							audioEnd.src="audio/defeat.mp3";
+							audioEnd.play();
+							scrode.innerHTML=0;
+							audios.pause();
+							audios.currentTime = 0;
+							alert('游戏结束'+'  最后得分:  '+numSc+'分');
+						}
+						//障碍物删除判断
+						if(tt==boxs.clientHeight-span.clientHeight){
+							clearInterval(imgTime);
+							span.remove();
+						}
+				}, timeImg);	
+			}, timeSet);
+		//获取键盘事件
+		document.onkeydown = function(e) {
+			var e = e || event;
+			var code = e.keyCode;
+//			alert(code)
+			switch(code) {
+				case 37:
+					_move.style.left = _move.offsetLeft -10+ "px";
+						//边界处理
+						if(_move.style.left<=0+'px'){
+							_move.style.left=6+'px'	
+						}
+					break;
+				case 38:
+					_move.style.top = _move.offsetTop - 20 + "px";
+					if(_move.offsetTop<=0){
+						_move.style.top=0+'px'	
+						}
+					
+					break;
+				case 39:
+					_move.style.left = _move.offsetLeft + 10 + "px";	
+					if(_move.offsetLeft>=boxs.clientWidth-_move.offsetWidth){
+						_move.style.left=boxs.clientWidth-_move.offsetWidth+'px'
+						}
+					break;
+				case 40:
+					_move.style.top = _move.offsetTop + 20 + "px";
+					if(_move.offsetTop>=boxs.clientHeight-_move.offsetHeight){
+						_move.style.top=boxs.clientHeight-_move.offsetHeight+'px'	
+					}
+					break;
+				case 32:
+					var pdDiv = document.createElement("div");
+					pdDiv.className="pd";
+					document.body.appendChild(pdDiv);
+					pdDiv.style.left=_move.offsetLeft+boxs.offsetLeft+_move.offsetWidth/2+pdDiv.offsetWidth+"px";	
+					pdDiv.style.top=_move.offsetTop+'px';
+					var  timer = setInterval(function(){
+					pdDiv.style.top=pdDiv.offsetTop-5+"px";
+						if(pdDiv.style.top<=0+'px'){
+							pdDiv.remove();
+							clearInterval(timer);
+						}
+						ph=pdDiv.offsetTop;
+						pl=pdDiv.offsetLeft;
+						ziDiv=pdDiv;
+						ziTime=timer;
+					},10);
+			}
+		}
+		},6500);
+	}
+	</script>
